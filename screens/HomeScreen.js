@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet, Button, Text } from "react-native";
+import { AuthUserContext } from "../navigation/AuthUserProvider";
 
 import useStatusBar from "../hooks/useStatusBar";
-import { auth, logout } from "../components/Firebase/firebase";
+import { logout } from "../components/Firebase/firebase";
 
 export default function HomeScreen() {
+  const { user } = useContext(AuthUserContext);
   useStatusBar("dark-content");
   async function handleSignOut() {
     try {
@@ -16,7 +18,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Hello {auth.currentUser.displayName}</Text>
+      <Text>Hello {JSON.stringify(user, null, 2)}</Text>
       <Button title="Sign Out" onPress={handleSignOut} />
     </View>
   );
