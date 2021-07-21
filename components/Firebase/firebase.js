@@ -15,14 +15,16 @@ export const db = firebase.firestore();
 export const loginWithEmail = (email, password) =>
   auth.signInWithEmailAndPassword(email, password);
 
-const initUserDetails = (authUser) => {
+const initUserDetails = (authUser, name) => {
   db.collection("users").doc(authUser.user.uid).set({
+    uid: authUser.user.uid,
     email: authUser.user.email,
-    name: authUser.user.displayName,
+    name: name,
     conversations: [],
     matches: [],
     swiped: [],
     isProfileComplete: false,
+    photoURL: "https://picsum.photos/500",
   });
 };
 
@@ -32,8 +34,12 @@ export const registerWithEmail = (email, password, name) => {
     .then((authUser) => {
       authUser.user.updateProfile({
         displayName: name,
+        photoURL: "https://picsum.photos/500",
       });
-      initUserDetails(authUser);
+      return authUser;
+    })
+    .then((authUser) => {
+      initUserDetails(authUser, name);
     })
     .catch((error) => {
       alert(error);
