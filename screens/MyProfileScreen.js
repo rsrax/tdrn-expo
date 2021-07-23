@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import {
-  StyleSheet,
   Text,
   ScrollView,
   ImageBackground,

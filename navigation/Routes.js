@@ -36,7 +36,7 @@ export default function Routes() {
   return (
     <NavigationContainer theme={navigationTheme}>
       <StatusBar style="auto" />
-      {user ? <AppTabsScreen /> : <AuthStack />}
+      {user ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }

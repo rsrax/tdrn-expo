@@ -8,18 +8,6 @@ import { db, logout } from "../components/Firebase/firebase";
 export default function HomeScreen() {
   const { user } = useContext(AuthUserContext);
   const [userList, setUserList] = useState([]);
-  const users = () => {
-    db.collection("users")
-      .get()
-      .then((querySnapshot) => {
-        const allUsers = querySnapshot.docs
-          .map((doc) => doc.data())
-          .filter((curUser) => curUser.email !== user.email);
-        // do something with documents
-        console.log(allUsers);
-        setUserList([...allUsers]);
-      });
-  };
 
   useEffect(() => {
     const fetchUsers = async () => {

@@ -230,6 +230,10 @@ export default StyleSheet.create({
     alignItems: "center",
   },
   title: { paddingBottom: 10, fontSize: 22, color: DARK_GRAY },
+  container: {
+    flex: 1,
+    padding: 24,
+  },
 
   // CONTAINER - HOME
   containerHome: {
