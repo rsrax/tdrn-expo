@@ -67,7 +67,8 @@ const EditProfileScreen = ({ navigation, route }) => {
     await db
       .collection("users")
       .doc(userProfile.uid)
-      .set({ ...values, isProfileComplete: true }, { merge: true });
+      .set({ ...values }, { merge: true });
+    navigation.pop();
   };
 
   let bs = React.createRef();

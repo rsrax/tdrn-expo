@@ -16,8 +16,9 @@ export default function AppStack() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    let unsubscribe;
     const checkProfileComplete = async () => {
-      await db
+      unsubscribe = await db
         .collection("users")
         .doc(user.uid)
         .get()
@@ -27,6 +28,9 @@ export default function AppStack() {
         });
     };
     checkProfileComplete();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
