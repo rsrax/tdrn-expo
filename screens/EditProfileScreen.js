@@ -5,7 +5,6 @@ import {
   View,
   Button,
   TouchableOpacity,
-  TextInput,
   ImageBackground,
   ScrollView,
   Platform,
@@ -61,8 +60,6 @@ const EditProfileScreen = ({ navigation, route }) => {
   const userProfile = route.params.userProfile;
   const [image, setImage] = useState(userProfile.photoURL);
   const [open, setOpen] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [transferred, setTransferred] = useState(0);
   const [items, setItems] = useState([
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
@@ -73,7 +70,7 @@ const EditProfileScreen = ({ navigation, route }) => {
       if (Platform.OS !== "web") {
         const { status } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
-        const { camStatus } = await ImagePicker.requestCameraPermissionsAsync();
+        await ImagePicker.requestCameraPermissionsAsync();
         if (status !== "granted") {
           alert("Sorry, we need camera roll permissions to make this work!");
         }
