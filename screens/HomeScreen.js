@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, StyleSheet, Button, Text } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { AuthUserContext } from "../navigation/AuthUserProvider";
 import CardStack, { Card } from "react-native-card-stack-swiper";
 
 import useStatusBar from "../hooks/useStatusBar";
-import { db, logout } from "../components/Firebase/firebase";
-import CardStackDeck from "../components/CardStackDeck";
+import { db } from "../components/Firebase/firebase";
 
 export default function HomeScreen() {
   const { user } = useContext(AuthUserContext);
