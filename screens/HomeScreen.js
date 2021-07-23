@@ -33,13 +33,6 @@ export default function HomeScreen() {
   }, []);
 
   useStatusBar("dark-content");
-  async function handleSignOut() {
-    try {
-      await logout();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <View style={styles.container}>
