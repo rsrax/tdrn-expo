@@ -45,6 +45,7 @@ const MyProfileScreen = ({ navigation }) => {
       }
     };
     getUserProfile();
+    console.log(userProfile.photoURL);
   }, []);
 
   if (isLoading) {

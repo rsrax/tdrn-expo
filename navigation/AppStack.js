@@ -28,9 +28,7 @@ export default function AppStack() {
         });
     };
     checkProfileComplete();
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   return (

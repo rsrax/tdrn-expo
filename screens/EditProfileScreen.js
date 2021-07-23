@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,16 +8,19 @@ import {
   TextInput,
   ImageBackground,
   ScrollView,
+  Platform,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import DropDownPicker from "react-native-dropdown-picker";
-import ImagePicker from "react-native-image-crop-picker";
+// import ImagePicker from "react-native-image-crop-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BottomSheet from "reanimated-bottom-sheet";
 import Animated from "react-native-reanimated";
+import * as ImagePicker from "expo-image-picker";
+import uuid from "react-native-uuid";
 
-import { db } from "../components/Firebase/firebase";
+import { db, storage } from "../components/Firebase/firebase";
 import FormField from "../components/Forms/FormField";
 import Styles from "../assets/styles";
 import Colors from "../utils/colors";
@@ -58,16 +61,35 @@ const EditProfileScreen = ({ navigation, route }) => {
   const userProfile = route.params.userProfile;
   const [image, setImage] = useState(userProfile.photoURL);
   const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [transferred, setTransferred] = useState(0);
   const [items, setItems] = useState([
     { label: "Male", value: "male" },
     { label: "Female", value: "female" },
   ]);
 
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { camStatus } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
   const updateProfile = async (values) => {
+    let photoURL = await uploadImageAsync(image);
+    if (photoURL === null && userProfile.photoURL !== null) {
+      photoURL = userProfile.photoURL;
+    }
     await db
       .collection("users")
       .doc(userProfile.uid)
-      .set({ ...values }, { merge: true });
+      .set({ ...values, photoURL }, { merge: true });
     navigation.pop();
   };
 
@@ -109,31 +131,60 @@ const EditProfileScreen = ({ navigation, route }) => {
     </View>
   );
 
-  const takePhotoFromCamera = () => {
-    ImagePicker.openCamera({
-      compressImageMaxWidth: 300,
-      compressImageMaxHeight: 300,
-      cropping: true,
-      compressImageQuality: 0.7,
-    }).then((image) => {
-      console.log(image);
-      setImage(image.path);
-      bs.current.snapTo(1);
+  const takePhotoFromCamera = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0,
     });
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
   };
 
-  const choosePhotoFromLibrary = () => {
-    ImagePicker.openPicker({
-      width: 300,
-      height: 300,
-      cropping: true,
-      compressImageQuality: 0.7,
-    }).then((image) => {
-      console.log(image);
-      setImage(image.path);
-      bs.current.snapTo(1);
+  const choosePhotoFromLibrary = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0,
     });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
   };
+
+  async function uploadImageAsync(uri) {
+    // Why are we using XMLHttpRequest? See:
+    // https://github.com/expo/expo/issues/2402#issuecomment-443726662
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const ref = storage.ref().child(`photos/${uuid.v4()}`);
+    const snapshot = await ref.put(blob);
+
+    // We're done with the blob, close and release it
+    blob.close();
+
+    return await snapshot.ref.getDownloadURL();
+  }
 
   return (
     <Formik
@@ -186,7 +237,7 @@ const EditProfileScreen = ({ navigation, route }) => {
                 >
                   <ImageBackground
                     source={{
-                      uri: userProfile.photoURL,
+                      uri: image,
                     }}
                     style={{ height: 100, width: 100 }}
                     imageStyle={{ borderRadius: 15 }}
