@@ -42,7 +42,7 @@ const validationSchema = Yup.object().shape({
     .label("The city you're in"),
 });
 
-const CompleteProfileScreen = () => {
+const CompleteProfileScreen = ({ navigation, updateComplete }) => {
   const { user } = useContext(AuthUserContext);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
@@ -54,7 +54,9 @@ const CompleteProfileScreen = () => {
     await db
       .collection("users")
       .doc(user.uid)
-      .set({ ...values, isProfileComplete: true }, { merge: true });
+      .set({ ...values, isProfileComplete: true }, { merge: true })
+      .then(() => navigation.navigate("Home"));
+    updateComplete(true);
   };
   return (
     <Formik

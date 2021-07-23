@@ -17,25 +17,18 @@ export default function AppStack() {
 
   useEffect(() => {
     const checkProfileComplete = async () => {
-      try {
-        await db
-          .collection("users")
-          .doc(user.uid)
-          .get()
-          .then((curUser) => {
-            if (curUser.data().isProfileComplete) {
-              setProfileComplete(true);
-              if (isLoading) {
-                setIsLoading(false);
-              }
-            }
-          });
-      } catch (e) {
-        console.log(e);
-      }
+      await db
+        .collection("users")
+        .doc(user.uid)
+        .get()
+        .then((curUser) => {
+          setProfileComplete(curUser.data().isProfileComplete);
+          setIsLoading(false);
+        });
     };
     checkProfileComplete();
   }, []);
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -50,14 +43,19 @@ export default function AppStack() {
         },
       }}
     >
-      {isLoading ? <Stack.Screen name="Loading" component={Spinner} /> : null}
+      {!isLoading ? <Stack.Screen name="Loading" component={Spinner} /> : null}
       {!profileComplete ? (
-        <Stack.Screen
-          name="CompleteProfile"
-          component={CompleteProfileScreen}
-        />
-      ) : null}
-      <Stack.Screen name="Home" component={AppTabs} />
+        <Stack.Screen name="CompleteProfile">
+          {(props) => (
+            <CompleteProfileScreen
+              {...props}
+              updateComplete={setProfileComplete}
+            />
+          )}
+        </Stack.Screen>
+      ) : (
+        <Stack.Screen name="Home" component={AppTabs} />
+      )}
     </Stack.Navigator>
   );
 }
