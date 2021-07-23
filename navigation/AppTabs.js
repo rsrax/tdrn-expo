@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/HomeScreen";
 import MatchesScreen from "../screens/MatchesScreen";
 import ChatsScreen from "../screens/ChatsScreen";
-import MyProfileScreen from "../screens/MyProfileScreen";
+import ProfileStack from "./ProfileStack";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import TabBarIcon from "../components/TabBarIcon";
 
@@ -62,7 +62,7 @@ const AppTabsScreen = () => {
       />
       <AppTabs.Screen
         name="My Profile"
-        component={MyProfileScreen}
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} iconName="person" text="Profile" />

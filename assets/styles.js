@@ -163,7 +163,7 @@ export default StyleSheet.create({
   // COMPONENT - PROFILE ITEM
   containerProfileItem: {
     backgroundColor: WHITE,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingBottom: 25,
     margin: 20,
     borderRadius: 8,
@@ -204,15 +204,18 @@ export default StyleSheet.create({
     paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
   },
   iconProfile: {
     fontSize: 12,
     color: DARK_GRAY,
     paddingHorizontal: 10,
+    flexWrap: "wrap",
   },
   infoContent: {
     color: GRAY,
     fontSize: 13,
+    flexWrap: "wrap",
   },
 
   // CONTAINER - GENERAL

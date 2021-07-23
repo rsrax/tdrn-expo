@@ -126,12 +126,12 @@ const CompleteProfileScreen = () => {
             />
             <FormField
               name="dogLikes"
-              leftIcon="dog-side"
+              leftIcon="bone"
               placeholder="Tell us what your doggo likes"
             />
             <FormField
               name="dogDislikes"
-              leftIcon="dog-side"
+              leftIcon="thumb-down"
               placeholder="Tell us what your doggo dislikes"
             />
             <FormField

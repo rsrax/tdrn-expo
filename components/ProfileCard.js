@@ -1,9 +1,17 @@
 import React from "react";
 import { Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import styles, { DARK_GRAY } from "../assets/styles";
 
-const ProfileCard = ({ age, info1, info2, info3, info4, location, name }) => (
+const ProfileCard = ({
+  age,
+  breedGender,
+  about,
+  likes,
+  dislikes,
+  location,
+  name,
+}) => (
   <View style={styles.containerProfileItem}>
     <Text style={styles.name}>{name}</Text>
 
@@ -13,30 +21,31 @@ const ProfileCard = ({ age, info1, info2, info3, info4, location, name }) => (
 
     <View style={styles.info}>
       <Text style={styles.iconProfile}>
-        <Ionicons name="person" size={20} color={DARK_GRAY} />
+        <MaterialCommunityIcons name="dog" size={20} color={DARK_GRAY} />
       </Text>
-      <Text style={styles.infoContent}>{info1}</Text>
+      <Text style={styles.infoContent}>{breedGender}</Text>
     </View>
 
     <View style={styles.info}>
       <Text style={styles.iconProfile}>
-        <Ionicons name="pizza" size={20} color={DARK_GRAY} />
+        <MaterialCommunityIcons name="book" size={20} color={DARK_GRAY} />
+        <Text style={styles.infoContent}>About</Text>
       </Text>
-      <Text style={styles.infoContent}>{info2}</Text>
+      <Text style={styles.infoContent}>{about}</Text>
     </View>
 
     <View style={styles.info}>
       <Text style={styles.iconProfile}>
-        <Ionicons name="airplane" size={20} color={DARK_GRAY} />
+        <MaterialCommunityIcons name="thumb-up" size={20} color={DARK_GRAY} />
       </Text>
-      <Text style={styles.infoContent}>{info3}</Text>
+      <Text style={styles.infoContent}>{likes}</Text>
     </View>
 
     <View style={styles.info}>
       <Text style={styles.iconProfile}>
-        <Ionicons name="calendar" size={20} color={DARK_GRAY} />
+        <MaterialCommunityIcons name="thumb-down" size={20} color={DARK_GRAY} />
       </Text>
-      <Text style={styles.infoContent}>{info4}</Text>
+      <Text style={styles.infoContent}>{dislikes}</Text>
     </View>
   </View>
 );

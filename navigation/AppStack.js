@@ -2,10 +2,11 @@ import React, { useState, useContext, useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import { AuthUserContext } from "./AuthUserProvider";
-import HomeScreen from "../screens/HomeScreen";
 import { db } from "../components/Firebase/firebase";
 import CompleteProfileScreen from "../screens/CompleteProfileScreen";
 import Spinner from "../components/Spinner";
+import AppTabs from "./AppTabs";
+import colors from "../utils/colors";
 
 const Stack = createStackNavigator();
 
@@ -35,18 +36,28 @@ export default function AppStack() {
     };
     checkProfileComplete();
   }, []);
-  if (isLoading) {
-    return <Spinner />;
-  }
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        title: "My home",
+        headerStyle: {
+          backgroundColor: colors.secondary,
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+          alignSelf: "center",
+        },
+      }}
+    >
+      {isLoading ? <Stack.Screen name="Loading" component={Spinner} /> : null}
       {!profileComplete ? (
         <Stack.Screen
           name="CompleteProfile"
           component={CompleteProfileScreen}
         />
       ) : null}
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Home" component={AppTabs} />
     </Stack.Navigator>
   );
 }

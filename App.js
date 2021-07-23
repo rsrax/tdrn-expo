@@ -1,12 +1,12 @@
 import React from "react";
-import { NativeBaseProvider } from "native-base";
+import { MenuProvider } from "react-native-popup-menu";
 
 import Providers from "./navigation";
 
 export default function App() {
   return (
-    <NativeBaseProvider>
+    <MenuProvider>
       <Providers />
-    </NativeBaseProvider>
+    </MenuProvider>
   );
 }
