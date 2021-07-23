@@ -43,7 +43,7 @@ export default function AppStack() {
         },
       }}
     >
-      {!isLoading ? <Stack.Screen name="Loading" component={Spinner} /> : null}
+      {isLoading ? <Stack.Screen name="Loading" component={Spinner} /> : null}
       {!profileComplete ? (
         <Stack.Screen name="CompleteProfile">
           {(props) => (

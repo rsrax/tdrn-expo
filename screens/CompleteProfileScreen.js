@@ -54,8 +54,7 @@ const CompleteProfileScreen = ({ navigation, updateComplete }) => {
     await db
       .collection("users")
       .doc(user.uid)
-      .set({ ...values, isProfileComplete: true }, { merge: true })
-      .then(() => navigation.navigate("Home"));
+      .set({ ...values, isProfileComplete: true }, { merge: true });
     updateComplete(true);
   };
   return (
