@@ -11,6 +11,8 @@ export default function HomeScreen() {
   const [userList, setUserList] = useState([]);
   const [userProfile, setUserProfile] = useState({});
   const [swiper, setSwiper] = useState(null);
+  const userLiked = [];
+  const userRejected = [];
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -37,7 +39,7 @@ export default function HomeScreen() {
           .get()
           .then((curUser) => {
             if (curUser.data()) {
-              setLoggedUser({ ...userProfile, ...curUser.data() });
+              setUserProfile({ ...userProfile, ...curUser.data() });
             }
           });
       } catch (e) {
@@ -45,20 +47,23 @@ export default function HomeScreen() {
       }
     };
     fetchUsers();
+   loggedUser();
   }, []);
 
   const RightSwiped = async (index) => {
+    userLiked.push(userList[index].uid);
     await db
       .collection("users")
       .doc(user.uid)
-      .set({liked:[ ...userProfile.liked, loggedUser.uid ]}, { merge: true });
+      .set({liked:[ ...userProfile.liked, ...userLiked ]}, { merge: true });
   };
 
   const LeftSwiped = async (index) => {
+    userRejected.push(userList[index].uid);
     await db
       .collection("users")
       .doc(user.uid)
-      .set({rejected:[ ...userProfile.rejected, loggedUser.uid ]}, { merge: true });
+      .set({rejected:[ ...userProfile.rejected, ...userRejected ]}, { merge: true });
   };
 
   useStatusBar("dark-content");
