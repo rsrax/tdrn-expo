@@ -24,7 +24,8 @@ const initUserDetails = (authUser, name) => {
     name: name,
     conversations: [],
     matches: [],
-    swiped: [],
+    liked: [],
+    rejected: [],
     isProfileComplete: false,
     photoURL: "https://picsum.photos/500",
   });

@@ -9,6 +9,7 @@ import { db } from "../components/Firebase/firebase";
 export default function HomeScreen() {
   const { user } = useContext(AuthUserContext);
   const [userList, setUserList] = useState([]);
+  const [userProfile, setUserProfile] = useState({});
   const [swiper, setSwiper] = useState(null);
 
   useEffect(() => {
@@ -28,8 +29,37 @@ export default function HomeScreen() {
         console.log(err);
       }
     };
+    const loggedUser = async () => {
+      try {
+        await db
+          .collection("users")
+          .doc(user.uid)
+          .get()
+          .then((curUser) => {
+            if (curUser.data()) {
+              setLoggedUser({ ...userProfile, ...curUser.data() });
+            }
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
     fetchUsers();
   }, []);
+
+  const RightSwiped = async (index) => {
+    await db
+      .collection("users")
+      .doc(user.uid)
+      .set({liked:[ ...userProfile.liked, loggedUser.uid ]}, { merge: true });
+  };
+
+  const LeftSwiped = async (index) => {
+    await db
+      .collection("users")
+      .doc(user.uid)
+      .set({rejected:[ ...userProfile.rejected, loggedUser.uid ]}, { merge: true });
+  };
 
   useStatusBar("dark-content");
 
@@ -46,8 +76,8 @@ export default function HomeScreen() {
           ref={(newSwiper) => {
             setSwiper(newSwiper);
           }}
-          onSwiped={(index) => console.log(userList[index])}
-          onSwipedLeft={() => console.log("onSwipedLeft")}
+          onSwipedRight={(index) => RightSwiped(index)}
+          onSwipedLeft={(index) => LeftSwiped(index)}
         >
           {userList.map((userL) => {
             return (
