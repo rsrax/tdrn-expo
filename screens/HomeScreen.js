@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import { AuthUserContext } from "../navigation/AuthUserProvider";
 import CardStack, { Card } from "react-native-card-stack-swiper";
 
@@ -19,10 +19,12 @@ export default function HomeScreen() {
       try {
         let list = [];
         db.collection("users")
+        .where("uid","not-in",[...userProfile.liked,...userProfile.rejected])
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((user) => {
               list.push(user.data());
+              console.log(user.data());
             });
             list = list.filter((curUser) => curUser.email !== user.email);
             setUserList(list);
@@ -46,8 +48,8 @@ export default function HomeScreen() {
         console.log(e);
       }
     };
-    fetchUsers();
    loggedUser();
+   fetchUsers();
   }, []);
 
   const RightSwiped = async (index) => {
@@ -55,6 +57,10 @@ export default function HomeScreen() {
     await db
       .collection("users")
       .doc(user.uid)
+      .get()
+      .then(() => {
+        if(user){}
+      })
       .set({liked:[ ...userProfile.liked, ...userLiked ]}, { merge: true });
   };
 
@@ -86,11 +92,13 @@ export default function HomeScreen() {
         >
           {userList.map((userL) => {
             return (
-              <Card style={[styles.card, styles.card1]}>
-                <Text style={styles.label}>
-                  {JSON.stringify(userL.dogName)}
-                </Text>
-              </Card>
+              
+              <View style={styles.user} key={userL.uid}>
+                <Card style={[styles.card, styles.card1]}>
+                  <Image source={{uri: userL.photoURL}} style={styles.image} />
+                  <Text style={styles.label}>{JSON.stringify(userL.dogName)}</Text>
+                </Card>
+              </View>
             );
           })}
         </CardStack>
@@ -127,13 +135,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEB12C",
   },
   label: {
+    textAlign: "center",
+    fontSize: 30,
+    fontFamily: "System",
+    color: "#F63A6E",
+    backgroundColor: "#ffffff",
+  },
+  
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  /* label: {
     lineHeight: 400,
     textAlign: "center",
     fontSize: 55,
     fontFamily: "System",
     color: "#ffffff",
     backgroundColor: "transparent",
-  },
+  }, */
   footer: {
     flex: 1,
     justifyContent: "center",
