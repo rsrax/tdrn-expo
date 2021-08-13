@@ -19,7 +19,7 @@ export default function HomeScreen() {
       try {
         let list = [];
         db.collection("users")
-        .where("uid","not-in",[...userProfile.liked,...userProfile.rejected])
+        .where("uid","not-in",userProfile.liked)
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((user) => {
@@ -48,6 +48,7 @@ export default function HomeScreen() {
         console.log(e);
       }
     };
+    
    loggedUser();
    fetchUsers();
   }, []);

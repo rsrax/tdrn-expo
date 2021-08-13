@@ -3,7 +3,6 @@ import { View, StyleSheet, Text, Image, ScrollView } from "react-native";
 import { AuthUserContext } from "../navigation/AuthUserProvider";
 import CardStack, { Card } from "react-native-card-stack-swiper";
 
-//import useStatusBar from "../hooks/useStatusBar";
 import { db } from "../components/Firebase/firebase";
 
 export default function HomeScreen() {
@@ -16,7 +15,7 @@ export default function HomeScreen() {
       try {
         let list = [];
         db.collection("users")
-        .where("uid","in",[...userProfile.matches])
+        //.where(matches,"array-contains",userProfile.uid)
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((user) => {
@@ -24,6 +23,8 @@ export default function HomeScreen() {
             });
             list = list.filter((curUser) => curUser.email !== user.email);
             setUserList(list);
+            
+   fetchUsers();
           });
       } catch (err) {
         console.log(err);
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   card: {
-    width: 175,
+    width: 150,
     height: 300,
     borderRadius: 5,
     borderColor: '#F63A6E',
