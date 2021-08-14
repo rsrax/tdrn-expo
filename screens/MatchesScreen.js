@@ -15,16 +15,15 @@ export default function HomeScreen() {
       try {
         let list = [];
         db.collection("users")
-        //.where(matches,"array-contains",userProfile.uid)
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((user) => {
               list.push(user.data());
             });
             list = list.filter((curUser) => curUser.email !== user.email);
+            list = list.filter((curUser) => userProfile.matches.indexOf(curUser.uid)>=0);
+            console.log(userProfile.matches);
             setUserList(list);
-            
-   fetchUsers();
           });
       } catch (err) {
         console.log(err);
@@ -47,6 +46,7 @@ export default function HomeScreen() {
     };
    loggedUser();
    fetchUsers();
+   return loggedUser,fetchUsers;
   }, []);
 
   return(

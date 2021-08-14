@@ -11,6 +11,7 @@ export default function HomeScreen() {
   const [userList, setUserList] = useState([]);
   const [userProfile, setUserProfile] = useState({});
   const [swiper, setSwiper] = useState(null);
+  const [match,setMatch] = useState(true);
   const userLiked = [];
   const userRejected = [];
 
@@ -18,8 +19,9 @@ export default function HomeScreen() {
     const fetchUsers = async () => {
       try {
         let list = [];
+        console.log(userProfile);
         db.collection("users")
-        .where("uid","not-in",userProfile.liked)
+        .where("uid","not-in",[...userProfile.liked])
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((user) => {
@@ -53,16 +55,66 @@ export default function HomeScreen() {
    fetchUsers();
   }, []);
 
+  const fun = async (index) => {
+    await db.collection("users")
+        .doc(user.uid)
+        .set({matches:[ ...userProfile.matches, userList[index].uid ]}, { merge: true });
+
+        // console.log(userList[index].uid);
+        // await db.collection("users")
+        // .doc(userList[index].uid)
+        // .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });    
+  }
+
+  const fun1 = async (index) => {
+        await db.collection("users")
+        .doc(userList[index].uid)
+        .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });    
+  }
+
+  const matfun = async(index) => {
+    console.log(userList[index].uid);
+    await db
+      .collection("users")
+      .doc(userList[index].uid)
+      .get()
+      .then((curUser)=>{
+        if(curUser.liked.indexOf(userProfile.uid)>=0)
+        {
+          
+    console.log(curUser.data());
+          fun1(index);
+          fun(index);
+        }
+      });
+  }
+
   const RightSwiped = async (index) => {
     userLiked.push(userList[index].uid);
     await db
       .collection("users")
       .doc(user.uid)
-      .get()
-      .then(() => {
-        if(user){}
-      })
       .set({liked:[ ...userProfile.liked, ...userLiked ]}, { merge: true });
+
+    matfun(index);
+
+      /*await db.collection("users")
+        .doc(user.uid)
+        .set({matches:[ ...userProfile.matches, userList[index].uid ]}, { merge: true });
+      //fun(index);
+      await db
+      .collection("users")
+      .doc(user.uid)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((user) => {
+          if(user.liked.indexOf(userProfile.uid)>=0)
+            {
+              fun(index);
+              fun1(index);
+            }
+        })
+      })*/
   };
 
   const LeftSwiped = async (index) => {
@@ -147,14 +199,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  /* label: {
-    lineHeight: 400,
-    textAlign: "center",
-    fontSize: 55,
-    fontFamily: "System",
-    color: "#ffffff",
-    backgroundColor: "transparent",
-  }, */
   footer: {
     flex: 1,
     justifyContent: "center",
