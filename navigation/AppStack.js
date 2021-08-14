@@ -34,7 +34,7 @@ export default function AppStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        title: "My home",
+        title: "Tindog",
         headerStyle: {
           backgroundColor: colors.secondary,
         },

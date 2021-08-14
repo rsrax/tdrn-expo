@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import { AuthUserContext } from "../navigation/AuthUserProvider";
 import CardStack, { Card } from "react-native-card-stack-swiper";
 
@@ -9,17 +9,24 @@ import { db } from "../components/Firebase/firebase";
 export default function HomeScreen() {
   const { user } = useContext(AuthUserContext);
   const [userList, setUserList] = useState([]);
+  const [userProfile, setUserProfile] = useState({});
   const [swiper, setSwiper] = useState(null);
+  const [match,setMatch] = useState(true);
+  const userLiked = [];
+  const userRejected = [];
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         let list = [];
+        console.log(userProfile);
         db.collection("users")
+        .where("uid","not-in",[...userProfile.liked])
           .get()
           .then((querySnapshot) => {
             querySnapshot.forEach((user) => {
               list.push(user.data());
+              console.log(user.data());
             });
             list = list.filter((curUser) => curUser.email !== user.email);
             setUserList(list);
@@ -28,8 +35,95 @@ export default function HomeScreen() {
         console.log(err);
       }
     };
-    fetchUsers();
+    const loggedUser = async () => {
+      try {
+        await db
+          .collection("users")
+          .doc(user.uid)
+          .get()
+          .then((curUser) => {
+            if (curUser.data()) {
+              setUserProfile({ ...userProfile, ...curUser.data() });
+            }
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    
+   loggedUser();
+   fetchUsers();
   }, []);
+
+  const fun = async (index) => {
+    await db.collection("users")
+        .doc(user.uid)
+        .set({matches:[ ...userProfile.matches, userList[index].uid ]}, { merge: true });
+
+        // console.log(userList[index].uid);
+        // await db.collection("users")
+        // .doc(userList[index].uid)
+        // .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });    
+  }
+
+  const fun1 = async (index) => {
+        await db.collection("users")
+        .doc(userList[index].uid)
+        .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });    
+  }
+
+  const matfun = async(index) => {
+    console.log(userList[index].uid);
+    await db
+      .collection("users")
+      .doc(userList[index].uid)
+      .get()
+      .then((curUser)=>{
+        if(curUser.liked.indexOf(userProfile.uid)>=0)
+        {
+          
+    console.log(curUser.data());
+          fun1(index);
+          fun(index);
+        }
+      });
+  }
+
+  const RightSwiped = async (index) => {
+    userLiked.push(userList[index].uid);
+    await db
+      .collection("users")
+      .doc(user.uid)
+      .set({liked:[ ...userProfile.liked, ...userLiked ]}, { merge: true });
+
+    matfun(index);
+
+      /*await db.collection("users")
+        .doc(user.uid)
+        .set({matches:[ ...userProfile.matches, userList[index].uid ]}, { merge: true });
+      //fun(index);
+      await db
+      .collection("users")
+      .doc(user.uid)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((user) => {
+          if(user.liked.indexOf(userProfile.uid)>=0)
+            {
+              fun(index);
+              fun1(index);
+            }
+        })
+      })*/
+  };
+
+  const LeftSwiped = async (index) => {
+    userRejected.push(userList[index].uid);
+    await db
+      .collection("users")
+      .doc(user.uid)
+      .set({rejected:[ ...userProfile.rejected, ...userRejected ]}, { merge: true });
+  };
 
   useStatusBar("dark-content");
 
@@ -46,16 +140,18 @@ export default function HomeScreen() {
           ref={(newSwiper) => {
             setSwiper(newSwiper);
           }}
-          onSwiped={(index) => console.log(userList[index])}
-          onSwipedLeft={() => console.log("onSwipedLeft")}
+          onSwipedRight={(index) => RightSwiped(index)}
+          onSwipedLeft={(index) => LeftSwiped(index)}
         >
           {userList.map((userL) => {
             return (
-              <Card style={[styles.card, styles.card1]}>
-                <Text style={styles.label}>
-                  {JSON.stringify(userL.dogName)}
-                </Text>
-              </Card>
+              
+              <View style={styles.user} key={userL.uid}>
+                <Card style={[styles.card, styles.card1]}>
+                  <Image source={{uri: userL.photoURL}} style={styles.image} />
+                  <Text style={styles.label}>{JSON.stringify(userL.dogName)}</Text>
+                </Card>
+              </View>
             );
           })}
         </CardStack>
@@ -92,12 +188,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEB12C",
   },
   label: {
-    lineHeight: 400,
     textAlign: "center",
-    fontSize: 55,
+    fontSize: 30,
     fontFamily: "System",
-    color: "#ffffff",
-    backgroundColor: "transparent",
+    color: "#F63A6E",
+    backgroundColor: "#ffffff",
+  },
+  
+  image: {
+    width: '100%',
+    height: '100%',
   },
   footer: {
     flex: 1,
