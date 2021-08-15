@@ -22,7 +22,7 @@ export default function AppStack() {
         .collection("users")
         .doc(user.uid)
         .get()
-        .then((curUser) => {
+        .then(curUser => {
           setProfileComplete(curUser.data().isProfileComplete);
           setIsLoading(false);
         });
@@ -36,28 +36,17 @@ export default function AppStack() {
       screenOptions={{
         title: "Tindog",
         headerStyle: {
-          backgroundColor: colors.secondary,
+          backgroundColor: colors.secondary
         },
-        headerTintColor: "#fff",
+        headerTintColor: "#ffff",
         headerTitleStyle: {
           fontWeight: "bold",
-          alignSelf: "center",
-        },
+          alignSelf: "center"
+        }
       }}
     >
       {isLoading ? <Stack.Screen name="Loading" component={Spinner} /> : null}
-      {!profileComplete ? (
-        <Stack.Screen name="CompleteProfile">
-          {(props) => (
-            <CompleteProfileScreen
-              {...props}
-              updateComplete={setProfileComplete}
-            />
-          )}
-        </Stack.Screen>
-      ) : (
-        <Stack.Screen name="Home" component={AppTabs} />
-      )}
+      {!profileComplete ? <Stack.Screen name="CompleteProfile">{props => <CompleteProfileScreen {...props} updateComplete={setProfileComplete} />}</Stack.Screen> : <Stack.Screen name="Home" component={AppTabs} />}
     </Stack.Navigator>
   );
 }
