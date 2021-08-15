@@ -11,72 +11,79 @@ export default function HomeScreen() {
   const [userProfile, setUserProfile] = useState({});
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        let list = [];
-        db.collection("users")
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((user) => {
-              list.push(user.data());
-            });
-            list = list.filter((curUser) => curUser.email !== user.email);
-            list = list.filter((curUser) => userProfile.matches.indexOf(curUser.uid)>=0);
-            console.log(userProfile.matches);
-            setUserList(list);
+    const fetchUsers = async (loggedInUser) => {
+      let list = [];
+      await db
+        .collection("users")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((user) => {
+            list.push(user.data());
           });
-      } catch (err) {
-        console.log(err);
-      }
+          list = list.filter((curUser) => curUser.email !== user.email);
+          list = list.filter(
+            (curUser) => loggedInUser.matches.indexOf(curUser.uid) >= 0
+          );
+          console.log(userProfile.matches);
+          setUserList(list);
+        });
     };
     const loggedUser = async () => {
-      try {
-        await db
-          .collection("users")
-          .doc(user.uid)
-          .get()
-          .then((curUser) => {
-            if (curUser.data()) {
-              setUserProfile({ ...userProfile, ...curUser.data() });
-            }
-          });
-      } catch (e) {
-        console.log(e);
-      }
+      await db
+        .collection("users")
+        .doc(user.uid)
+        .get()
+        .then((curUser) => {
+          if (curUser.data()) {
+            setUserProfile({ ...userProfile, ...curUser.data() });
+          }
+          return curUser;
+        })
+        .then((curUser) => {
+          fetchUsers(curUser.data());
+        });
     };
-   loggedUser();
-   fetchUsers();
-   return loggedUser,fetchUsers;
+    loggedUser();
   }, []);
 
-  return(
-  <View style={styles.container}>
-        <Text style={{fontWeight: 'bold', fontSize: 24, color: '#F63A6E', textAlign: 'center', marginBottom: 10}}>
-          Matches
-        </Text>
-        <ScrollView>
+  return (
+    <View style={styles.container}>
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: 24,
+          color: "#F63A6E",
+          textAlign: "center",
+          marginBottom: 10,
+        }}
+      >
+        Matches
+      </Text>
+      <ScrollView>
         <View style={styles.users}>
-          {userList.map(userL => (
+          {userList.map((userL) => (
             <View style={styles.user} key={userL.uid}>
               <Card style={styles.card}>
-              <Image source={{uri: userL.photoURL}} style={styles.image} />
-              <Text style={styles.label}>{JSON.stringify(userL.dogName)}</Text>
-            </Card>
+                <Image source={{ uri: userL.photoURL }} style={styles.image} />
+                <Text style={styles.label}>
+                  {JSON.stringify(userL.dogName)}
+                </Text>
+              </Card>
             </View>
           ))}
         </View>
-        </ScrollView>
-      </View>
+      </ScrollView>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     padding: 10,
   },
   users: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   user: {
     width: 175,
@@ -85,14 +92,14 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   card: {
     width: 150,
     height: 300,
     borderRadius: 5,
-    borderColor: '#F63A6E',
+    borderColor: "#F63A6E",
   },
   label: {
     textAlign: "center",

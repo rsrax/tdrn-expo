@@ -11,7 +11,6 @@ export default function HomeScreen() {
   const [userList, setUserList] = useState([]);
   const [userProfile, setUserProfile] = useState({});
   const [swiper, setSwiper] = useState(null);
-  // const [match, setMatch] = useState(true);
   const userLiked = [];
   const userRejected = [];
 
@@ -49,46 +48,6 @@ export default function HomeScreen() {
     loggedUser();
   }, []);
 
-  // const fun = async (index) => {
-  //   await db
-  //     .collection("users")
-  //     .doc(user.uid)
-  //     .set(
-  //       { matches: [...userProfile.matches, userList[index].uid] },
-  //       { merge: true }
-  //     );
-
-  // console.log(userList[index].uid);
-  // await db.collection("users")
-  // .doc(userList[index].uid)
-  // .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });
-  // };
-
-  // const fun1 = async (index) => {
-  //   await db
-  //     .collection("users")
-  //     .doc(userList[index].uid)
-  //     .set(
-  //       { matches: [...userList[index].matches, userProfile.uid] },
-  //       { merge: true }
-  //     );
-  // };
-
-  // const matfun = async (index) => {
-  //   console.log(userList[index].uid);
-  //   await db
-  //     .collection("users")
-  //     .doc(userList[index].uid)
-  //     .get()
-  //     .then((curUser) => {
-  //       if (curUser.liked.indexOf(userProfile.uid) >= 0) {
-  //         console.log(curUser.data());
-  //         fun1(index);
-  //         fun(index);
-  //       }
-  //     });
-  // };
-
   const RightSwiped = async (index) => {
     userLiked.push(userList[index].uid);
     await db
@@ -96,8 +55,6 @@ export default function HomeScreen() {
       .doc(user.uid)
       .set({ liked: [...userProfile.liked, ...userLiked] }, { merge: true });
 
-    console.log(userProfile);
-    console.log("^^^^^^^^^^^^^^");
     userProfile.liked.push(userList[index].uid);
     if (userList[index].liked.includes(userProfile.uid)) {
       userProfile.matches.push(userList[index].uid);
@@ -105,8 +62,6 @@ export default function HomeScreen() {
         .collection("users")
         .doc(user.uid)
         .set({ matches: [...userProfile.matches] }, { merge: true });
-      console.log(userList[index]);
-      console.log("-----------------");
       await db
         .collection("users")
         .doc(userList[index].uid)

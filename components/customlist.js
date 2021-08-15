@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ListItem, Avatar } from "react-native-elements";
-import { auth } from "../components/Firebase/firebase";
+import { auth, db } from "../components/Firebase/firebase";
 
-const customlist = ({ id, chatName, enterChat }) => {
+const customlist = ({ key, id, chatName, enterChat }) => {
   const [userProfile, setUserProfile] = useState({});
   useEffect(() => {
     const loggedUser = async () => {
@@ -13,7 +13,7 @@ const customlist = ({ id, chatName, enterChat }) => {
           .collection("users")
           .doc(user.uid)
           .get()
-          .then(curUser => {
+          .then((curUser) => {
             if (curUser.data()) {
               setUserProfile({ ...userProfile, ...curUser.data() });
             }
@@ -25,17 +25,22 @@ const customlist = ({ id, chatName, enterChat }) => {
     return loggedUser;
   }, []);
   return (
-    <View>
-      <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
+    <View key={key}>
+      <ListItem onPress={() => enterChat(id, chatName)} bottomDivider>
         <Avatar
           rounded
           source={{
-            uri: "https://www.thesprucepets.com/thmb/sfuyyLvyUx636_Oq3Fw5_mt-PIc=/3760x2820/smart/filters:no_upscale()/adorable-white-pomeranian-puppy-spitz-921029690-5c8be25d46e0fb000172effe.jpg"
+            uri: "https://www.thesprucepets.com/thmb/sfuyyLvyUx636_Oq3Fw5_mt-PIc=/3760x2820/smart/filters:no_upscale()/adorable-white-pomeranian-puppy-spitz-921029690-5c8be25d46e0fb000172effe.jpg",
           }}
         />
         <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "900" }}>{chatName}</ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail"></ListItem.Subtitle>
+          <ListItem.Title style={{ fontWeight: "900" }}>
+            {chatName}
+          </ListItem.Title>
+          <ListItem.Subtitle
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          ></ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>
     </View>
