@@ -11,110 +11,110 @@ export default function HomeScreen() {
   const [userList, setUserList] = useState([]);
   const [userProfile, setUserProfile] = useState({});
   const [swiper, setSwiper] = useState(null);
-  const [match,setMatch] = useState(true);
+  // const [match, setMatch] = useState(true);
   const userLiked = [];
   const userRejected = [];
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        let list = [];
-        console.log(userProfile);
-        db.collection("users")
-        .where("uid","not-in",[...userProfile.liked])
-          .get()
-          .then((querySnapshot) => {
-            querySnapshot.forEach((user) => {
-              list.push(user.data());
-              console.log(user.data());
-            });
-            list = list.filter((curUser) => curUser.email !== user.email);
-            setUserList(list);
+    const fetchUsers = async (loggedInUser) => {
+      let list = [];
+      db.collection("users")
+        .where("uid", "not-in", [...loggedInUser.liked])
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((user) => {
+            list.push(user.data());
           });
-      } catch (err) {
-        console.log(err);
-      }
+          list = list.filter((curUser) => curUser.email !== user.email);
+          setUserList(list);
+        });
     };
+
     const loggedUser = async () => {
-      try {
-        await db
-          .collection("users")
-          .doc(user.uid)
-          .get()
-          .then((curUser) => {
-            if (curUser.data()) {
-              setUserProfile({ ...userProfile, ...curUser.data() });
-            }
-          });
-      } catch (e) {
-        console.log(e);
-      }
+      await db
+        .collection("users")
+        .doc(user.uid)
+        .get()
+        .then((curUser) => {
+          if (curUser.data()) {
+            setUserProfile({ ...userProfile, ...curUser.data() });
+          }
+          return curUser;
+        })
+        .then((curUser) => {
+          fetchUsers(curUser.data());
+        });
     };
-    
-   loggedUser();
-   fetchUsers();
+
+    loggedUser();
   }, []);
 
-  const fun = async (index) => {
-    await db.collection("users")
-        .doc(user.uid)
-        .set({matches:[ ...userProfile.matches, userList[index].uid ]}, { merge: true });
+  // const fun = async (index) => {
+  //   await db
+  //     .collection("users")
+  //     .doc(user.uid)
+  //     .set(
+  //       { matches: [...userProfile.matches, userList[index].uid] },
+  //       { merge: true }
+  //     );
 
-        // console.log(userList[index].uid);
-        // await db.collection("users")
-        // .doc(userList[index].uid)
-        // .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });    
-  }
+  // console.log(userList[index].uid);
+  // await db.collection("users")
+  // .doc(userList[index].uid)
+  // .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });
+  // };
 
-  const fun1 = async (index) => {
-        await db.collection("users")
-        .doc(userList[index].uid)
-        .set({matches:[...userList[index].matches,userProfile.uid]}, { merge: true });    
-  }
+  // const fun1 = async (index) => {
+  //   await db
+  //     .collection("users")
+  //     .doc(userList[index].uid)
+  //     .set(
+  //       { matches: [...userList[index].matches, userProfile.uid] },
+  //       { merge: true }
+  //     );
+  // };
 
-  const matfun = async(index) => {
-    console.log(userList[index].uid);
-    await db
-      .collection("users")
-      .doc(userList[index].uid)
-      .get()
-      .then((curUser)=>{
-        if(curUser.liked.indexOf(userProfile.uid)>=0)
-        {
-          
-    console.log(curUser.data());
-          fun1(index);
-          fun(index);
-        }
-      });
-  }
+  // const matfun = async (index) => {
+  //   console.log(userList[index].uid);
+  //   await db
+  //     .collection("users")
+  //     .doc(userList[index].uid)
+  //     .get()
+  //     .then((curUser) => {
+  //       if (curUser.liked.indexOf(userProfile.uid) >= 0) {
+  //         console.log(curUser.data());
+  //         fun1(index);
+  //         fun(index);
+  //       }
+  //     });
+  // };
 
   const RightSwiped = async (index) => {
     userLiked.push(userList[index].uid);
     await db
       .collection("users")
       .doc(user.uid)
-      .set({liked:[ ...userProfile.liked, ...userLiked ]}, { merge: true });
+      .set({ liked: [...userProfile.liked, ...userLiked] }, { merge: true });
 
-    matfun(index);
-
-      /*await db.collection("users")
-        .doc(user.uid)
-        .set({matches:[ ...userProfile.matches, userList[index].uid ]}, { merge: true });
-      //fun(index);
+    console.log(userProfile);
+    console.log("^^^^^^^^^^^^^^");
+    userProfile.liked.push(userList[index].uid);
+    if (userList[index].liked.includes(userProfile.uid)) {
+      userProfile.matches.push(userList[index].uid);
       await db
-      .collection("users")
-      .doc(user.uid)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((user) => {
-          if(user.liked.indexOf(userProfile.uid)>=0)
-            {
-              fun(index);
-              fun1(index);
-            }
-        })
-      })*/
+        .collection("users")
+        .doc(user.uid)
+        .set({ matches: [...userProfile.matches] }, { merge: true });
+      console.log(userList[index]);
+      console.log("-----------------");
+      await db
+        .collection("users")
+        .doc(userList[index].uid)
+        .set(
+          { matches: [...userList[index].matches, userProfile.uid] },
+          { merge: true }
+        );
+    }
   };
 
   const LeftSwiped = async (index) => {
@@ -122,7 +122,10 @@ export default function HomeScreen() {
     await db
       .collection("users")
       .doc(user.uid)
-      .set({rejected:[ ...userProfile.rejected, ...userRejected ]}, { merge: true });
+      .set(
+        { rejected: [...userProfile.rejected, ...userRejected] },
+        { merge: true }
+      );
   };
 
   useStatusBar("dark-content");
@@ -145,11 +148,15 @@ export default function HomeScreen() {
         >
           {userList.map((userL) => {
             return (
-              
               <View style={styles.user} key={userL.uid}>
                 <Card style={[styles.card, styles.card1]}>
-                  <Image source={{uri: userL.photoURL}} style={styles.image} />
-                  <Text style={styles.label}>{JSON.stringify(userL.dogName)}</Text>
+                  <Image
+                    source={{ uri: userL.photoURL }}
+                    style={styles.image}
+                  />
+                  <Text style={styles.label}>
+                    {JSON.stringify(userL.dogName)}
+                  </Text>
                 </Card>
               </View>
             );
@@ -194,10 +201,10 @@ const styles = StyleSheet.create({
     color: "#F63A6E",
     backgroundColor: "#ffffff",
   },
-  
+
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   footer: {
     flex: 1,
