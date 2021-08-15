@@ -19,6 +19,7 @@
     "expo-asset": "~8.3.1",
     "expo-constants": "~10.1.3",
     "expo-font": "~9.1.0",
+<<<<<<< Updated upstream
     "expo-image-picker": "^10.2.2",
 =======
     "expo-image-picker": "~10.1.4",
